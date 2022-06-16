@@ -22,7 +22,7 @@ class AbstractWriter:
 
     def write(self,data):
         LOGGER.info(f"Write data to {self.filepath}")
-        self._save(self._write(data))
+        return self._save(self._write(data))
 
 class JSONWriter(AbstractWriter):
     class DateTimeJSONEncoder(json.JSONEncoder):
@@ -33,3 +33,14 @@ class JSONWriter(AbstractWriter):
     def _save(self,data):
         with open(self.filepath,"w") as output:
             json.dump(data,output,indent=4,cls=self.DateTimeJSONEncoder)
+            return data
+
+class StringWriter(AbstractWriter):
+    class DateTimeJSONEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, (datetime.date, datetime.datetime)):
+                return obj.isoformat()
+
+    def _save(self,data):
+        output= json.dumps(data,indent=4 , cls=self.DateTimeJSONEncoder)
+        return output
