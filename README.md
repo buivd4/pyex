@@ -1,10 +1,17 @@
 # pyex
-Excel to JSON converter
+Excel to JSON converter.<br>
+Version: 0.0.1
 
+Author: buivd4@hotmail.com
 
 ## Install
 ```shell
 ./pyex> python3 -m pip install .
+```
+
+## Docker
+```shell
+./pyex> docker build -t pyex:0.0.1 .
 ```
 
 ## Usage
