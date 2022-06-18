@@ -10,17 +10,20 @@ Excel to JSON converter
 ## Usage
 ```shell
 $ pyex -h
-usage: pyex [-h] [--input INPUT] [--output OUTPUT] [--exclude EXCLUDE] [--ffill FFILL] [--default DEFAULT] [--verbose]
+usage: pyex [-h] [--serve] [--port PORT] [--input INPUT] [--output OUTPUT]
+            [--exclude EXCLUDE] [--ffill FFILL] [--default DEFAULT] [--verbose]
 
- ___   _     ____  _
-| |_) \ \_/ | |_  \ \_/
-|_|    |_|  |_|__ /_/ \
+ ___   _     ____  _    
+| |_) \ \_/ | |_  \ \_/ 
+|_|    |_|  |_|__ /_/ \ 
 Excel to JSON converter.
 Author: buivd4@hotmail.com
 Version: 0.0.1
 
 optional arguments:
   -h, --help            show this help message and exit
+  --serve, -s           Run pyex API service
+  --port PORT, -p PORT  Specify port of API service
   --input INPUT, -i INPUT
                         Input file path. Must be excel (xlsx) file.
   --output OUTPUT, -o OUTPUT

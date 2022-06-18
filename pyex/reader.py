@@ -1,7 +1,9 @@
-from openpyxl import load_workbook
-from pyex.data import Data,Sheet
-import re
 import logging
+import re
+
+from openpyxl import load_workbook
+
+from pyex.data import Data, Sheet
 
 LOGGER = logging.getLogger("pyex")
 

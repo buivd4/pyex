@@ -1,9 +1,7 @@
 from setuptools import setup, find_packages
-from pyex import VERSION
-
 setup(
    name='pyex',
-   version=VERSION,
+   version="0.0.1",
    description='Excel to JSON converter.',
    author='Duong Bui',
    author_email='buivd4@hotmail.com',
@@ -12,6 +10,9 @@ setup(
         'console_scripts': ['pyex=pyex.main:run'],
     },
    install_requires=[
-       "openpyxl==3.0.10"
+       "openpyxl==3.0.10",
+       "flask==2.1.2",
+       "waitress==2.1.2",
+       "accept-types==0.4.1"
    ]
 )
