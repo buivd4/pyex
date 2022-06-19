@@ -1,0 +1,103 @@
+openapi: 3.0.0
+servers: [
+  {
+    "url": "localhost:5001/api/v1/"
+  }
+]
+info:
+  description: Pyex API Service
+  version: 1.0.0
+  title: Pyex - Excel to JSON converter
+  contact:
+    email: buivd4@hotmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: health
+    description: Service health check
+  - name: convert
+    description: Excel to JSON convert API
+paths:
+  /health:
+    get:
+      tags:
+        - health
+      summary: service health check
+      operationId: healthCheck
+      description: |
+        return health status and version of Pyex API service
+      responses:
+        '200':
+          description: service health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceHeathStatus'
+        '405':
+          description: Invalid Accept or Content-Type
+        '500':
+          description: Server Error
+  /convert/upload:
+    post:
+      tags:
+        - convert
+      summary: upload excel file and convert to JSON
+      operationId: convertUpload
+      description: return converted data as JSON
+      responses:
+        '200':
+          description: converted data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConvertedExcelAsJSON'
+
+        '400':
+          description: Bad Request
+        '405':
+          description: Invalid Accept or Content-Type
+        '500':
+          description: Server Error
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConvertExcelRequest'
+        description: Inventory item to add
+components:
+  schemas:
+    ServiceHeathStatus:
+      type: object
+      required:
+        - status
+        - version
+      properties:
+        status:
+          type: string
+          enum: [ "HEAlTHY", "UNHEALTHY", "UNKNOW" ]
+          example: "HEALTHY"
+        version:
+          type: string
+          example: "0.0.2"
+    ConvertExcelRequest:
+      type: object
+      required:
+        - excel
+      properties:
+        excel:
+          type: string
+          format: binary
+    ConvertedExcelAsJSON:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          example:
+            sheet1:
+              - field1: value1
+                field2: value2
+              - field1: value3
+                field2: value4

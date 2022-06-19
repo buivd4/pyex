@@ -6,7 +6,7 @@ from pyex.api.decorator.common_validator import header_check
 health_api = Blueprint('health', __name__)
 
 
-@health_api.route('', methods=['POST'])
+@health_api.route('', methods=['GET'])
 @header_check
 def health():
     return jsonify({

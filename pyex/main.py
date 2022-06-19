@@ -31,12 +31,18 @@ def introduction():
 def run():
     parser = argparse.ArgumentParser(description=introduction(), formatter_class=RawTextHelpFormatter)
     parser.add_argument("--serve", "-s", action="store_true", help="Run pyex API service")
-    parser.add_argument("--port", "-p", type=int, default=5000, help="Specify port of API service")
+    parser.add_argument("--host", type=str, default=os.environ.get("PYEX_HOST", "localhost"),
+                        help="Specify host of API service")
+    parser.add_argument("--port", type=int, default=int(os.environ.get("PYEX_PORT", 5000)),
+                        help="Specify port of API service")
     parser.add_argument("--input", "-i", type=str, help="Input file path. Must be excel (xlsx) file.")
     parser.add_argument("--output", "-o", type=str, help="Output file. Should be .json extension.")
-    parser.add_argument("--exclude", "-e", type=str, default=os.environ.get("PYEX_EXCLUDE"), help="Exclude sheet by name if match pattern.")
-    parser.add_argument("--ffill", type=str, default=os.environ.get("PYEX_FFILL", ""), help="FFill columns. Format: [0-9]+,[0-9]+,..,[0-9]+")
-    parser.add_argument("--default", type=str, default=os.environ.get("PYEX_DEFAULT", "undefined"), help="Default value for missing data")
+    parser.add_argument("--exclude", "-e", type=str, default=os.environ.get("PYEX_EXCLUDE"),
+                        help="Exclude sheet by name if match pattern.")
+    parser.add_argument("--ffill", type=str, default=os.environ.get("PYEX_FFILL", ""),
+                        help="FFill columns. Format: [0-9]+,[0-9]+,..,[0-9]+")
+    parser.add_argument("--default", type=str, default=os.environ.get("PYEX_DEFAULT", "undefined"),
+                        help="Default value for missing data")
     parser.add_argument("--verbose", "-v", action="store_true", help="Run with verbose mode")
     args = parser.parse_args()
 
@@ -48,13 +54,13 @@ def run():
         "default": args.default,
         "ffill": ffill_list
     }
-    verbose = args.verbose or os.environ.get("PYEX_VERBOSE", False)
+    verbose = args.verbose or os.environ.get("PYEX_VERBOSE", "false") == "true"
     if args.serve:
         app = create_app(configurations)
         if verbose:
-            app.run(port=args.port)
+            app.run(host=args.host, port=args.port)
         else:
-            waitress.serve(app, port=args.port)
+            waitress.serve(app, host=args.host, port=args.port)
     else:
         if verbose:
             LOGGER.setLevel(logging.DEBUG)
