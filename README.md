@@ -70,13 +70,12 @@ We can also create a "lazy" processor ie. an shorcut to run many processors at a
 
 ```shell
 $ pyex -h
-usage: pyex [-h] [--serve] [--host HOST] [--port PORT] [--input INPUT]
-            [--output OUTPUT] [--exclude EXCLUDE] [--ffill FFILL]
-            [--default DEFAULT] [--verbose]
+usage: pyex [-h] [--serve] [--host HOST] [--port PORT] [--input INPUT] [--input-directory INPUT_DIRECTORY] [--output-directory OUTPUT_DIRECTORY] [--output OUTPUT] [--exclude EXCLUDE] [--ffill FFILL] [--default DEFAULT]
+            [--flatten] [--processors [PROCESSORS ...]] [--verbose]
 
- ___   _     ____  _    
-| |_) \ \_/ | |_  \ \_/ 
-|_|    |_|  |_|__ /_/ \ 
+ ___   _     ____  _
+| |_) \ \_/ | |_  \ \_/
+|_|    |_|  |_|__ /_/ \
 Excel to JSON converter.
 Author: buivd4@hotmail.com
 Version: 0.0.1
@@ -84,15 +83,22 @@ Version: 0.0.1
 optional arguments:
   -h, --help            show this help message and exit
   --serve, -s           Run pyex API service
-  --host HOST           Specify host of API service
-  --port PORT           Specify port of API service
+  --host HOST           specify host of API service
+  --port PORT           specify port of API service
   --input INPUT, -i INPUT
-                        Input file path. Must be excel (xlsx) file.
+                        input file path. Must be excel (xlsx) file.
+  --input-directory INPUT_DIRECTORY, -iD INPUT_DIRECTORY
+                        input directory.
+  --output-directory OUTPUT_DIRECTORY, -oD OUTPUT_DIRECTORY
+                        output directory.
   --output OUTPUT, -o OUTPUT
-                        Output file. Should be .json extension.
+                        output file. Should be .json extension.
   --exclude EXCLUDE, -e EXCLUDE
-                        Exclude sheet by name if match pattern.
-  --ffill FFILL         FFill columns. Format: [0-9]+,[0-9]+,..,[0-9]+
-  --default DEFAULT     Default value for missing data
-  --verbose, -v         Run with verbose mode
+                        exclude sheet by name if match pattern.
+  --ffill FFILL         ffill columns. Format: [0-9]+,[0-9]+,..,[0-9]+
+  --default DEFAULT     default value for missing data
+  --flatten             write output in flatten json format
+  --processors [PROCESSORS ...]
+                        processor classes
+  --verbose, -v         run with verbose mode
 ```
