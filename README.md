@@ -58,7 +58,7 @@ For example:
 
 Note that the order of processors is matter. To define your own processor, check ```example_processor```.
 
-We can also create a "lazy" processor ie. an shorcut to run many processors at a time
+We can also create a "lazy" processor like a shortcut to run many pre-defined processors
 
 ```bash
 .\pyex> pyex -i "file.xlsx" -o "file.json" -e "(How to fill Skill set|Title|Programming Language|Revision History)" --ffill "0,1" --processors \
