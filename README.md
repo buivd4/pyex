@@ -40,6 +40,32 @@ Please check Open API Specification at:
 pyex_oas.yml
 ```
 
+## Processing steps
+```bash
+  Reader -> Processor1 -> Processor2 -> ... -> ProcessorN -> Writer
+```
+
+To define processor(s), using flag ```--processors```
+
+For example:
+
+```bash
+.\pyex> pyex -i "file.xlsx" -o "file.json" -e "(How to fill Skill set|Title|Programming Language|Revision History)" --ffill "0,1" --processors \
+.\pyex\example_processor\add_user_info.py:AddUserInfoProcessor \
+.\pyex\example_processor\change_header.py:ChangeHeaderProcessor \
+.\pyex\example_processor\remove_invalid_data.py:RemoveInvalidDataProcessor
+```
+
+Note that the order of processors is matter. To define your own processor, check ```example_processor```.
+
+We can also create a "lazy" processor ie. an shorcut to run many processors at a time
+
+```bash
+.\pyex> pyex -i "file.xlsx" -o "file.json" -e "(How to fill Skill set|Title|Programming Language|Revision History)" --ffill "0,1" --processors \
+.\pyex\example_processor\lazy_processor.py:LazyProcessor
+```
+
+
 ## Usage
 
 ```shell

@@ -6,13 +6,19 @@ LOGGER = logging.getLogger("pyex")
 
 
 class AbstractWriter:
+    def __init__(self, grp_by_sheet=True):
+        self.grp_by_sheet=grp_by_sheet
+
     def _write(self, data):
-        output = {}
+        output = {} if self.grp_by_sheet else []
         for sheet in data.sheets:
             dt_sheet = []
             for record in sheet.data:
                 dt_sheet.append(dict(zip(sheet.header, record)))
-            output.update({sheet.name: dt_sheet})
+            if self.grp_by_sheet:
+                output.update({sheet.name: dt_sheet})
+            else:
+                output.extend(dt_sheet)
         return output
 
     def _save(self, data):
@@ -23,13 +29,14 @@ class AbstractWriter:
 
 
 class JSONWriter(AbstractWriter):
-    def __init__(self, filepath):
-        self.filepath = filepath
-
     class DateTimeJSONEncoder(json.JSONEncoder):
         def default(self, obj):
             if isinstance(obj, (datetime.date, datetime.datetime)):
                 return obj.isoformat()
+
+    def __init__(self, filepath, grp_by_sheet=True):
+        self.filepath = filepath
+        super().__init__(grp_by_sheet)
 
     def _save(self, data):
         with open(self.filepath, "w") as output:
