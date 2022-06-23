@@ -10,8 +10,9 @@ from pyex import VERSION
 from pyex.api.app import create_app
 from pyex.reader import Reader
 from pyex.writer import JSONWriter
-from pyex.converter import Converter
+from pyex.converter import *
 from pyex.processor_chain import ProcessorChain
+from pyex.utils import *
 
 LOGGER = logging.getLogger("pyex")
 LOGGING_HANDLER = logging.StreamHandler(sys.stdout)
@@ -38,6 +39,8 @@ def run():
     parser.add_argument("--port", type=int, default=int(os.environ.get("PYEX_PORT", 5000)),
                         help="specify port of API service")
     parser.add_argument("--input", "-i", type=str, help="input file path. Must be excel (xlsx) file.")
+    parser.add_argument("--input-directory", "-iD", type=str, help="input directory.")
+    parser.add_argument("--output-directory", "-oD", type=str, help="output directory.")
     parser.add_argument("--output", "-o", type=str, help="output file. Should be .json extension.")
     parser.add_argument("--exclude", "-e", type=str, default=os.environ.get("PYEX_EXCLUDE"),
                         help="exclude sheet by name if match pattern.")
@@ -78,6 +81,21 @@ def run():
             app.run(host=args.host, port=args.port)
         else:
             waitress.serve(app, host=args.host, port=args.port)
+    elif args.input_directory:
+        if not args.output_directory:
+            LOGGER.error("Missing argument: output_directory")
+            exit()
+        if not os.path.exists(args.output_directory):
+            os.mkdir(args.output_directory)
+        readers = []
+        writers = []
+        for fp in os.listdir(args.input_directory):
+            if is_file_of_extension(fp, "xlsx"):
+                readers.append(Reader(filepath = os.path.join(args.input_directory, fp), **configurations))
+                writers.append(JSONWriter(filepath = os.path.join(args.output_directory, change_extension(fp, "json")), grp_by_sheet=not args.flatten))
+        
+        converter = BuckConverter(readers,processor_chain,writers)
+        converter.run()
     else:
         reader = Reader(filepath = args.input, **configurations)
         writer = JSONWriter(args.output, grp_by_sheet=not args.flatten)

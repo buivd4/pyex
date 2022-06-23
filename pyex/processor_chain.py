@@ -3,6 +3,7 @@ import importlib
 import sys
 import os
 from pyex.processor import AbstractProcessor
+from pyex.utils import get_filename_without_extension
 
 def load_processor(module_as_str):
     #__import__ method used
@@ -11,7 +12,7 @@ def load_processor(module_as_str):
     *module_str, class_name = module_as_str.split(":")
     module_str = ":".join(module_str)
     module_path = os.path.dirname(os.path.realpath(module_str))
-    module_name = ".".join(os.path.basename(module_str).split(".")[:-1])
+    module_name = get_filename_without_extension(module_str)
     sys.path.append(module_path)
     module = __import__(module_name)
 
