@@ -11,8 +11,4 @@ class CleanProcessor(AbstractProcessor):
         data.get_sheet("13. Test Eng").header.pop(0)
         data.get_sheet("13. Test Eng").buck_delete(0)
         data.get_sheet("13. Test Eng").header[0]="items"
-        data.get_sheet("13. Test Eng").header.pop(4)
-        data.get_sheet("13. Test Eng").buck_delete(4)
-        data.get_sheet("13. Test Eng").header.pop(4)
-        data.get_sheet("13. Test Eng").buck_delete(4)
         return data

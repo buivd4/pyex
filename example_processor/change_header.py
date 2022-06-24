@@ -5,7 +5,10 @@ from pyex.processor import AbstractProcessor
 class ChangeHeaderProcessor(AbstractProcessor):
     @staticmethod
     def normalize_header(header):
-        return header.replace(" ","_").replace("(","_").replace(")","_").replace("/","_").lower()
+        new_header= header.replace(" ","_").replace("(","_").replace(")","_").replace("/","_").lower()
+        if new_header in ("experience__months_","experience__months"):
+            return "experience_months"
+        return new_header
 
     def execute(self, data: Data)-> Data:
         for sheet in data.sheets:

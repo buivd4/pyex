@@ -87,15 +87,12 @@ def run():
             exit()
         if not os.path.exists(args.output_directory):
             os.mkdir(args.output_directory)
-        readers = []
-        writers = []
         for fp in os.listdir(args.input_directory):
             if is_file_of_extension(fp, "xlsx"):
-                readers.append(Reader(filepath = os.path.join(args.input_directory, fp), **configurations))
-                writers.append(JSONWriter(filepath = os.path.join(args.output_directory, change_extension(fp, "json")), grp_by_sheet=not args.flatten))
-        
-        converter = BuckConverter(readers,processor_chain,writers)
-        converter.run()
+                reader=Reader(filepath = os.path.join(args.input_directory, fp), **configurations)
+                writer=JSONWriter(filepath = os.path.join(args.output_directory, change_extension(fp, "json")), grp_by_sheet=not args.flatten)
+                converter = Converter(reader,processor_chain,writer)
+                converter.run()
     else:
         reader = Reader(filepath = args.input, **configurations)
         writer = JSONWriter(args.output, grp_by_sheet=not args.flatten)
