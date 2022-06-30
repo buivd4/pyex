@@ -11,7 +11,7 @@ LOGGER = logging.getLogger("pyex")
 class Reader:
     def __init__(self, filepath, with_header=True, default = None, exclude=None, ffill = []):
         self.filepath = filepath
-        self.workbook = load_workbook(filepath)
+        self.workbook = load_workbook(filepath,data_only=True)
         self.with_header = with_header
         self.default = default
         self.exclude = exclude

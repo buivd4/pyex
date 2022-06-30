@@ -3,13 +3,14 @@ import logging
 import os
 import sys
 from argparse import RawTextHelpFormatter
-
+import datetime
 import waitress
+from multiprocessing import Process
+import json
+
 
 from pyex import VERSION
 from pyex.api.app import create_app
-from pyex.reader import Reader
-from pyex.writer import JSONWriter
 from pyex.converter import *
 from pyex.processor_chain import ProcessorChain
 from pyex.utils import *
@@ -38,10 +39,12 @@ def run():
                         help="specify host of API service")
     parser.add_argument("--port", type=int, default=int(os.environ.get("PYEX_PORT", 5000)),
                         help="specify port of API service")
-    parser.add_argument("--input", "-i", type=str, help="input file path. Must be excel (xlsx) file.")
+    parser.add_argument("--input", "-iF", type=str, help="input file path. Must be excel (xlsx) file.")
+    parser.add_argument("--output", "-oF", type=str, help="output file. Should be .json extension.")
     parser.add_argument("--input-directory", "-iD", type=str, help="input directory.")
     parser.add_argument("--output-directory", "-oD", type=str, help="output directory.")
-    parser.add_argument("--output", "-o", type=str, help="output file. Should be .json extension.")
+    parser.add_argument("--max-concurrent",  type=int, help="max concurrent processor.")    
+    parser.add_argument("--one-file", action="store_true", help="output should be 1 file.")    
     parser.add_argument("--exclude", "-e", type=str, default=os.environ.get("PYEX_EXCLUDE"),
                         help="exclude sheet by name if match pattern.")
     parser.add_argument("--ffill", type=str, default=os.environ.get("PYEX_FFILL", ""),
@@ -62,6 +65,7 @@ def run():
         "exclude": args.exclude,
         "default": args.default,
         "ffill": ffill_list,
+        "flatten": args.flatten
     }
     verbose = args.verbose or os.environ.get("PYEX_VERBOSE", "false") == "true"
     print(f"Verbose mode: {verbose}")
@@ -87,17 +91,37 @@ def run():
             exit()
         if not os.path.exists(args.output_directory):
             os.mkdir(args.output_directory)
+        process_list = []
+        start_time = datetime.datetime.now()
         for fp in os.listdir(args.input_directory):
             if is_file_of_extension(fp, "xlsx"):
-                reader=Reader(filepath = os.path.join(args.input_directory, fp), **configurations)
-                writer=JSONWriter(filepath = os.path.join(args.output_directory, change_extension(fp, "json")), grp_by_sheet=not args.flatten)
-                converter = Converter(reader,processor_chain,writer)
-                converter.run()
+                converter = Converter(fin = os.path.join(args.input_directory, fp) ,fout = os.path.join(args.output_directory, change_extension(fp, "json")), processor_chain=processor_chain, configurations = configurations)
+                p = Process(name=fp,target=converter.convert)
+                process_list.append(p)
+                p.start()
+                LOGGER.info(f"Folk new process for {fp}")
+        for p in process_list:
+            p.join()
+        end_time = datetime.datetime.now()
+        LOGGER.info(f"Processed {len(process_list)} files in {(end_time-start_time).seconds} second(s)")
+        if args.one_file:
+            if not args.output:
+                LOGGER.error("Must provide output file when --one-file flag is on")
+            output = []
+            target_files = [fp for fp in os.listdir(args.output_directory) if is_file_of_extension(fp, "json")]
+            for i in range(0, len(target_files), args.max_concurrent):
+                for fp in target_files[i:i+args.max_concurrent]:
+                    with open(os.path.join(args.output_directory, fp), "r") as f:              
+                        output.extend(json.load(f))
+                os.remove(os.path.join(args.output_directory, fp))
+            with open(args.output,"w+") as fout:
+                json.dump(output, fout, indent=4)
     else:
-        reader = Reader(filepath = args.input, **configurations)
-        writer = JSONWriter(args.output, grp_by_sheet=not args.flatten)
-        converter = Converter(reader,processor_chain,writer)
+        start_time = datetime.datetime.now()
+        converter = Converter(fin = args.input, fout= args.output ,processor_chain=processor_chain,configurations=configurations)
         converter.run()
+        end_time = datetime.datetime.now()
+        LOGGER.info(f"Processed file in {(end_time-start_time).seconds} second(s)")
 
 if __name__ == "__main__":
     run()
